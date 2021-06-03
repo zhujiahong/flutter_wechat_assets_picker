@@ -529,6 +529,24 @@ class FileAssetPickerBuilder
           ),
         ),
         appBar(context),
+        Positioned(
+          top: 100.0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 200,
+            color: Colors.blue,
+            child: Text("第一个组件"),
+          ),
+        ),
+        // Container(
+        //   height: 50,
+        //   color: Colors.white,
+        // ),
+        // Container(
+        //   height: 50,
+        //   color: Colors.red,
+        // ),
       ],
     );
   }

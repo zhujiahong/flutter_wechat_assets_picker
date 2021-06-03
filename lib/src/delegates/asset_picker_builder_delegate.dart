@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -262,12 +263,12 @@ abstract class AssetPickerBuilderDelegate<A, P> {
         builder: (_, List<A> currentAssets, __) => CustomScrollView(
           controller: gridScrollController,
           slivers: <Widget>[
-            if (isAppleOS)
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: Screens.topSafeHeight + kToolbarHeight,
-                ),
-              ),
+            // if (isAppleOS)
+            //   SliverToBoxAdapter(
+            //     child: SizedBox(
+            //       height: Screens.topSafeHeight + kToolbarHeight,
+            //     ),
+            //   ),
             SliverGrid(
               delegate: SliverChildBuilderDelegate(
                 (_, int index) => Builder(
@@ -588,7 +589,11 @@ class DefaultAssetPickerBuilderDelegate
   Widget appleOSLayout(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Positioned.fill(
+        Positioned(
+          top: 500.0,
+          left: 0,
+          right: 0,
+          height: 300,
           child: Selector<DefaultAssetPickerProvider, bool>(
             selector: (_, DefaultAssetPickerProvider p) => p.hasAssetsToDisplay,
             builder: (_, bool hasAssetsToDisplay, __) => AnimatedSwitcher(
@@ -602,17 +607,17 @@ class DefaultAssetPickerBuilderDelegate
                               Positioned.fill(
                                 child: assetsGridBuilder(context),
                               ),
-                              if ((!isSingleAssetMode || isAppleOS) &&
-                                  isPreviewEnabled)
-                                PositionedDirectional(
-                                  bottom: 0.0,
-                                  child: bottomActionBar(context),
-                                ),
+                              // if ((!isSingleAssetMode || isAppleOS) &&
+                              //     isPreviewEnabled)
+                              //   PositionedDirectional(
+                              //     bottom: 0.0,
+                              //     child: bottomActionBar(context),
+                              //   ),
                             ],
                           ),
                         ),
-                        pathEntityListBackdrop(context),
-                        pathEntityListWidget(context),
+                        // pathEntityListBackdrop(context),
+                        // pathEntityListWidget(context),
                       ],
                     )
                   : loadingIndicator(context),
@@ -620,6 +625,29 @@ class DefaultAssetPickerBuilderDelegate
           ),
         ),
         appBar(context),
+        Positioned(
+          top: 100.0,
+          left: 0,
+          right: 0,
+          height: MediaQuery.of(context).size.width,
+          child: Selector<DefaultAssetPickerProvider, bool>(
+            selector: (_, DefaultAssetPickerProvider p) => p.hasAssetsToDisplay,
+            builder: (_, bool hasAssetsToDisplay, __) => hasAssetsToDisplay
+                ? Container(
+                    // height: 300,
+                    color: Colors.redAccent,
+                    child: Consumer<DefaultAssetPickerProvider>(
+                        builder: (_, DefaultAssetPickerProvider provider, __) =>
+                            extendView(
+                                context,
+                                provider.selectedAssets.isEmpty
+                                    ? provider.currentAssets.first
+                                    : provider.selectedAssets.last)))
+                : loadingIndicator(context),
+          ),
+        ),
+        pathEntityListBackdrop(context),
+        pathEntityListWidget(context),
       ],
     );
   }
@@ -1355,6 +1383,33 @@ class DefaultAssetPickerBuilderDelegate
           },
         ),
       ),
+    );
+  }
+
+  Widget extendView(BuildContext context, AssetEntity asset) {
+    final AssetEntityImageProvider imageProvider = AssetEntityImageProvider(
+      asset,
+      isOriginal: true,
+      thumbSize: <int>[gridThumbSize, gridThumbSize],
+    );
+    return ExtendedImage(
+      image: imageProvider,
+      fit: BoxFit.contain,
+      //enableLoadState: false,
+      mode: ExtendedImageMode.gesture,
+      initGestureConfigHandler: (state) {
+        return GestureConfig(
+          minScale: 1,
+          animationMinScale: 0.5,
+          maxScale: 3.0,
+          animationMaxScale: 3.5,
+          speed: 1.0,
+          inertialSpeed: 100.0,
+          initialScale: 1.0,
+          inPageView: false,
+          initialAlignment: InitialAlignment.bottomRight,
+        );
+      },
     );
   }
 
