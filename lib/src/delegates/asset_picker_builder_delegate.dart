@@ -451,6 +451,7 @@ class DefaultAssetPickerBuilderDelegate
     WidgetBuilder? specialItemBuilder,
     IndicatorBuilder? loadingIndicatorBuilder,
     bool allowSpecialItemWhenEmpty = false,
+    this.pushAssets,
     this.gridThumbSize = Constants.defaultGridThumbSize,
     this.previewThumbSize,
     this.specialPickerType,
@@ -469,6 +470,8 @@ class DefaultAssetPickerBuilderDelegate
           loadingIndicatorBuilder: loadingIndicatorBuilder,
           allowSpecialItemWhenEmpty: allowSpecialItemWhenEmpty,
         );
+
+  final Function? pushAssets;
 
   /// Thumbnail size in the grid.
   /// 预览时网络的缩略图大小
@@ -576,10 +579,11 @@ class DefaultAssetPickerBuilderDelegate
       // - On iOS, show if no preview and multi asset mode. This is because for iOS
       //   the [bottomActionBar] has the confirm button, but if no preview,
       //   [bottomActionBar] is not displayed.
-      actions: (!isAppleOS || !isPreviewEnabled) &&
-              (isPreviewEnabled || !isSingleAssetMode)
-          ? <Widget>[confirmButton(context)]
-          : null,
+      actions: <Widget>[nextPage()],
+      // (!isAppleOS || !isPreviewEnabled) &&
+      //         (isPreviewEnabled || !isSingleAssetMode)
+      //     ? <Widget>[confirmButton(context)]
+      //     : null,
       actionsPadding: const EdgeInsetsDirectional.only(end: 14.0),
       blurRadius: isAppleOS ? appleOSBlurRadius : 0.0,
     );
@@ -635,14 +639,13 @@ class DefaultAssetPickerBuilderDelegate
             builder: (_, bool hasAssetsToDisplay, __) => hasAssetsToDisplay
                 ? Container(
                     // height: 300,
-                    color: Colors.redAccent,
+                    color: Colors.black,
                     child: Consumer<DefaultAssetPickerProvider>(
                         builder: (_, DefaultAssetPickerProvider provider, __) =>
                             extendView(
                                 context,
-                                provider.selectedAssets.isEmpty
-                                    ? provider.currentAssets.first
-                                    : provider.selectedAssets.last)))
+                                provider.currentTapAsset ??
+                                    provider.currentAssets.first)))
                 : loadingIndicator(context),
           ),
         ),
@@ -877,6 +880,15 @@ class DefaultAssetPickerBuilderDelegate
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         );
       },
+    );
+  }
+
+  Widget nextPage() {
+    return IconButton(
+      onPressed: () {
+        pushAssets!();
+      },
+      icon: const Icon(Icons.navigate_next),
     );
   }
 
@@ -1287,11 +1299,13 @@ class DefaultAssetPickerBuilderDelegate
           onTap: () {
             if (selected) {
               provider.unSelectAsset(asset);
+              provider.currentTapAsset = provider.selectedAssets.last;
             } else {
               if (isSingleAssetMode) {
                 provider.selectedAssets.clear();
               }
               provider.selectAsset(asset);
+              provider.currentTapAsset = asset;
               if (isSingleAssetMode && !isPreviewEnabled) {
                 Navigator.of(context).pop(provider.selectedAssets);
               }
@@ -1329,6 +1343,25 @@ class DefaultAssetPickerBuilderDelegate
           // When the special type is WeChat Moment, pictures and videos cannot
           // be selected at the same time. Video select should be banned if any
           // pictures are selected.
+
+          final bool selected = provider.selectedAssets.contains(asset);
+          if (selected) {
+            provider.unSelectAsset(asset);
+            provider.currentTapAsset = provider.selectedAssets.last;
+          } else {
+            if (isSingleAssetMode) {
+              provider.selectedAssets.clear();
+            }
+            if (provider.selectedAssets.length < 9) {
+              provider.currentTapAsset = asset;
+            }
+            provider.selectAsset(asset);
+
+            if (isSingleAssetMode && !isPreviewEnabled) {
+              Navigator.of(context).pop(provider.selectedAssets);
+            }
+          }
+
           if (isWeChatMoment &&
               asset.type == AssetType.video &&
               provider.selectedAssets.isNotEmpty) {
@@ -1354,21 +1387,21 @@ class DefaultAssetPickerBuilderDelegate
             _selected = provider.selectedAssets;
             _index = index;
           }
-          final List<AssetEntity>? result =
-              await AssetPickerViewer.pushToViewer(
-            context,
-            currentIndex: _index,
-            previewAssets: _current,
-            themeData: theme,
-            previewThumbSize: previewThumbSize,
-            selectedAssets: _selected,
-            selectorProvider: provider as DefaultAssetPickerProvider,
-            specialPickerType: specialPickerType,
-            maxAssets: provider.maxAssets,
-          );
-          if (result != null) {
-            Navigator.of(context).pop(result);
-          }
+          // final List<AssetEntity>? result =
+          //     await AssetPickerViewer.pushToViewer(
+          //   context,
+          //   currentIndex: _index,
+          //   previewAssets: _current,
+          //   themeData: theme,
+          //   previewThumbSize: previewThumbSize,
+          //   selectedAssets: _selected,
+          //   selectorProvider: provider as DefaultAssetPickerProvider,
+          //   specialPickerType: specialPickerType,
+          //   maxAssets: provider.maxAssets,
+          // );
+          // if (result != null) {
+          //   Navigator.of(context).pop(result);
+          // }
         },
         child: Selector<DefaultAssetPickerProvider, List<AssetEntity>>(
           selector: (_, DefaultAssetPickerProvider p) => p.selectedAssets,

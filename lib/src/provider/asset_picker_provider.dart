@@ -178,6 +178,17 @@ abstract class AssetPickerProvider<A, P> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Selected assets.
+  /// 已选中的资源
+  A? _currentTapAsset;
+
+  A? get currentTapAsset => _currentTapAsset;
+
+  set currentTapAsset(A? value) {
+    _currentTapAsset = value;
+    notifyListeners();
+  }
+
   /// Descriptions for selected assets currently.
   /// 当前已被选中的资源的描述
   ///

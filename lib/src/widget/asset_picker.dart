@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 ///
 /// [Author] Alex (https://github.com/Alex525)
 /// [Date] 2020/3/31 15:39
@@ -40,6 +42,7 @@ class AssetPicker<A, P> extends StatelessWidget {
     SpecialItemPosition specialItemPosition = SpecialItemPosition.none,
     bool allowSpecialItemWhenEmpty = false,
     bool useRootNavigator = true,
+    Function? pushAssets,
     Curve routeCurve = Curves.easeIn,
     Duration routeDuration = const Duration(milliseconds: 300),
   }) async {
@@ -92,19 +95,19 @@ class AssetPicker<A, P> extends StatelessWidget {
           child: AssetPicker<AssetEntity, AssetPathEntity>(
             key: Constants.pickerKey,
             builder: DefaultAssetPickerBuilderDelegate(
-              provider: provider,
-              gridCount: gridCount,
-              textDelegate: textDelegate,
-              themeColor: themeColor,
-              pickerTheme: pickerTheme,
-              gridThumbSize: gridThumbSize,
-              previewThumbSize: previewThumbSize,
-              specialPickerType: specialPickerType,
-              specialItemPosition: specialItemPosition,
-              specialItemBuilder: specialItemBuilder,
-              loadingIndicatorBuilder: loadingIndicatorBuilder,
-              allowSpecialItemWhenEmpty: allowSpecialItemWhenEmpty,
-            ),
+                provider: provider,
+                gridCount: gridCount,
+                textDelegate: textDelegate,
+                themeColor: themeColor,
+                pickerTheme: pickerTheme,
+                gridThumbSize: gridThumbSize,
+                previewThumbSize: previewThumbSize,
+                specialPickerType: specialPickerType,
+                specialItemPosition: specialItemPosition,
+                specialItemBuilder: specialItemBuilder,
+                loadingIndicatorBuilder: loadingIndicatorBuilder,
+                allowSpecialItemWhenEmpty: allowSpecialItemWhenEmpty,
+                pushAssets: pushAssets),
           ),
         );
         final List<AssetEntity>? result = await Navigator.of(
