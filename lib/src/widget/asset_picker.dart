@@ -42,7 +42,7 @@ class AssetPicker<A, P> extends StatelessWidget {
     SpecialItemPosition specialItemPosition = SpecialItemPosition.none,
     bool allowSpecialItemWhenEmpty = false,
     bool useRootNavigator = true,
-    Function? pushAssets,
+    Function(List<AssetEntity>)? pushAssets,
     Curve routeCurve = Curves.easeIn,
     Duration routeDuration = const Duration(milliseconds: 300),
   }) async {

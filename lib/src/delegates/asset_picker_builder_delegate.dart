@@ -471,7 +471,7 @@ class DefaultAssetPickerBuilderDelegate
           allowSpecialItemWhenEmpty: allowSpecialItemWhenEmpty,
         );
 
-  final Function? pushAssets;
+  final Function(List<AssetEntity>)? pushAssets;
 
   /// Thumbnail size in the grid.
   /// 预览时网络的缩略图大小
@@ -886,7 +886,7 @@ class DefaultAssetPickerBuilderDelegate
   Widget nextPage() {
     return IconButton(
       onPressed: () {
-        pushAssets!();
+        pushAssets!(provider.selectedAssets);
       },
       icon: const Icon(Icons.navigate_next),
     );
