@@ -1388,7 +1388,7 @@ class DefaultAssetPickerBuilderDelegate
             );
             if (result != null) {
               Navigator.of(context).pop();
-              pushAssets!(provider.selectedAssets);
+              pushAssets!([asset]);
             } else {
               return;
             }
