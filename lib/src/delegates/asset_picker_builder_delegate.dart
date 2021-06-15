@@ -1352,22 +1352,6 @@ class DefaultAssetPickerBuilderDelegate
             return;
           }
           final bool selected = provider.selectedAssets.contains(asset);
-          if (selected) {
-            provider.unSelectAsset(asset);
-            provider.currentTapAsset = provider.selectedAssets.last;
-          } else {
-            if (isSingleAssetMode) {
-              provider.selectedAssets.clear();
-            }
-            if (provider.selectedAssets.length < 9) {
-              provider.currentTapAsset = asset;
-            }
-            provider.selectAsset(asset);
-
-            if (isSingleAssetMode && !isPreviewEnabled) {
-              Navigator.of(context).pop(provider.selectedAssets);
-            }
-          }
 
           final List<AssetEntity> _current;
           final List<AssetEntity>? _selected;
@@ -1405,6 +1389,22 @@ class DefaultAssetPickerBuilderDelegate
             if (result != null) {
               Navigator.of(context).pop();
               pushAssets!(provider.selectedAssets);
+            }
+          }
+          if (selected) {
+            provider.unSelectAsset(asset);
+            provider.currentTapAsset = provider.selectedAssets.last;
+          } else {
+            if (isSingleAssetMode) {
+              provider.selectedAssets.clear();
+            }
+            if (provider.selectedAssets.length < 9) {
+              provider.currentTapAsset = asset;
+            }
+            provider.selectAsset(asset);
+
+            if (isSingleAssetMode && !isPreviewEnabled) {
+              Navigator.of(context).pop(provider.selectedAssets);
             }
           }
         },
