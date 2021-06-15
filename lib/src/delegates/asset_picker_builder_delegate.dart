@@ -1403,7 +1403,7 @@ class DefaultAssetPickerBuilderDelegate
               maxAssets: provider.maxAssets,
             );
             if (result != null) {
-              // Navigator.of(context).pop(result);
+              Navigator.of(context).pop();
               pushAssets!(provider.selectedAssets);
             }
           }
