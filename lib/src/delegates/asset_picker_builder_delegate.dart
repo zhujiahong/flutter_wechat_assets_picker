@@ -1304,8 +1304,11 @@ class DefaultAssetPickerBuilderDelegate
               if (isSingleAssetMode) {
                 provider.selectedAssets.clear();
               }
+              if (provider.selectedAssets.length < 9) {
+                provider.currentTapAsset = asset;
+              }
               provider.selectAsset(asset);
-              provider.currentTapAsset = asset;
+
               if (isSingleAssetMode && !isPreviewEnabled) {
                 Navigator.of(context).pop(provider.selectedAssets);
               }
@@ -1343,7 +1346,11 @@ class DefaultAssetPickerBuilderDelegate
           // When the special type is WeChat Moment, pictures and videos cannot
           // be selected at the same time. Video select should be banned if any
           // pictures are selected.
-
+          if (isWeChatMoment &&
+              asset.type == AssetType.video &&
+              provider.selectedAssets.isNotEmpty) {
+            return;
+          }
           final bool selected = provider.selectedAssets.contains(asset);
           if (selected) {
             provider.unSelectAsset(asset);
@@ -1362,11 +1369,6 @@ class DefaultAssetPickerBuilderDelegate
             }
           }
 
-          if (isWeChatMoment &&
-              asset.type == AssetType.video &&
-              provider.selectedAssets.isNotEmpty) {
-            return;
-          }
           final List<AssetEntity> _current;
           final List<AssetEntity>? _selected;
           final int _index;
@@ -1387,21 +1389,24 @@ class DefaultAssetPickerBuilderDelegate
             _selected = provider.selectedAssets;
             _index = index;
           }
-          // final List<AssetEntity>? result =
-          //     await AssetPickerViewer.pushToViewer(
-          //   context,
-          //   currentIndex: _index,
-          //   previewAssets: _current,
-          //   themeData: theme,
-          //   previewThumbSize: previewThumbSize,
-          //   selectedAssets: _selected,
-          //   selectorProvider: provider as DefaultAssetPickerProvider,
-          //   specialPickerType: specialPickerType,
-          //   maxAssets: provider.maxAssets,
-          // );
-          // if (result != null) {
-          //   Navigator.of(context).pop(result);
-          // }
+          if (asset.type == AssetType.video) {
+            final List<AssetEntity>? result =
+                await AssetPickerViewer.pushToViewer(
+              context,
+              currentIndex: _index,
+              previewAssets: _current,
+              themeData: theme,
+              previewThumbSize: previewThumbSize,
+              selectedAssets: _selected,
+              selectorProvider: provider as DefaultAssetPickerProvider,
+              specialPickerType: specialPickerType,
+              maxAssets: provider.maxAssets,
+            );
+            if (result != null) {
+              // Navigator.of(context).pop(result);
+              pushAssets!(provider.selectedAssets);
+            }
+          }
         },
         child: Selector<DefaultAssetPickerProvider, List<AssetEntity>>(
           selector: (_, DefaultAssetPickerProvider p) => p.selectedAssets,
