@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -886,6 +887,9 @@ class DefaultAssetPickerBuilderDelegate
   Widget nextPage() {
     return IconButton(
       onPressed: () {
+        if (provider.selectedAssets.length < 1) {
+          provider.selectAsset(provider.currentTapAsset!);
+        }
         pushAssets!(provider.selectedAssets);
       },
       icon: const Icon(Icons.navigate_next),
